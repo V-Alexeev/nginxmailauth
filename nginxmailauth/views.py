@@ -10,14 +10,15 @@ from forms import PasswordChangeForm
 
 
 def authenticate(request):
-    username = request.META['HTTP_AUTH_USER']
-    password = request.META['HTTP_AUTH_PASS']
-    protocol = request.META['HTTP_AUTH_PROTOCOL']
-    shared_secret = request.META['HTTP_X_NGX_AUTH_KEY']
-    
-    if shared_secret != settings.NGX_AUTH_KEY or \
+    username = request.META.get('HTTP_AUTH_USER')
+    password = request.META.get('HTTP_AUTH_PASS')
+    protocol = request.META.get('HTTP_AUTH_PROTOCOL')
+    shared_secret = request.META.get('HTTP_X_NGX_AUTH_KEY')
+
+    if None in [username, password, protocol, shared_secret] or\
+    shared_secret != settings.NGX_AUTH_KEY or \
     request.META['REMOTE_ADDR'] not in settings.ALLOWED_NGINX_IPS:
-        return HttpResponseForbidden
+        return HttpResponseForbidden()
 
     try:
         mail_user = MailUser.objects.select_related().get(internal_username=username)
