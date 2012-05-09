@@ -61,3 +61,24 @@ class PlaintextAuthenticationMethod(BaseAuthenticationMethod):
     @classmethod
     def get_password(cls, mail_user, password):
         return password
+
+
+try:
+    import kerberos
+except ImportError:
+    pass
+else:
+    class KerberosAuthenticationMethod(BaseAuthenticationMethod):
+        @classmethod
+        def authenticate(cls, mail_user, password):
+            mail_user = mail_user.internal_username.split("+")[-1] # Allow to have more than 1 krb-authenticated account for user
+            mail_user = mail_user.split("@")
+            if len(mail_user) != 2: # Failed to split to [username, domain]
+                return False
+            username, domain = mail_user[0], mail_user[1].upper() # Kerberos uses uppercase domains
+            mail_user = "@".join((username, domain))
+            try:
+                result = kerberos.checkPassword(mail_user, password, "", domain)
+            except kerberos.KrbError:
+                return False
+            return result
