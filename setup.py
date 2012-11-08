@@ -29,5 +29,5 @@ setup(name='nginxmailauth',
     platforms=['any'],
     classifiers=CLASSIFIERS,
     install_requires=[],
-    version='0.6',
+    version='0.61',
 )

@@ -10,7 +10,13 @@ class MailUserAdmin(admin.ModelAdmin):
     list_display = ('internal_username', 'external_username', 'server', 'disabled')
     list_filter = ('server', 'auth_method')
     search_fields = ('internal_username', 'external_username')
-    actions = ['randomize_password']
+    actions = ['randomize_password', 'disable_accounts', 'enable_accounts']
+
+    def disable_accounts(self, request, queryset):
+        queryset.update(disabled=True)
+
+    def enable_accounts(self, request, queryset):
+        queryset.update(disabled=True)
 
     def randomize_password(self, request, queryset):
         passwords = {}
