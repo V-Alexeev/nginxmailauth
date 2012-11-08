@@ -14,7 +14,7 @@ class PasswordChangeForm(forms.Form):
         except (MailUser.DoesNotExist, MailUser.MultipleObjectsReturned):
             raise forms.ValidationError("Incorrect username or old password")
 
-        if mail_user.authenticate(self.cleaned_data['old_password']):
+        if (not mail_user.disabled) and mail_user.authenticate(self.cleaned_data['old_password']):
             self.cleaned_data['user'] = mail_user
         else:
             raise forms.ValidationError("Incorrect username or old password")

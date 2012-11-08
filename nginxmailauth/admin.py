@@ -7,7 +7,9 @@ from utils import generate_password
 
 
 class MailUserAdmin(admin.ModelAdmin):
-    list_display = ('internal_username', 'external_username', 'server')
+    list_display = ('internal_username', 'external_username', 'server', 'disabled')
+    list_filter = ('server', 'auth_method')
+    search_fields = ('internal_username', 'external_username')
     actions = ['randomize_password']
 
     def randomize_password(self, request, queryset):

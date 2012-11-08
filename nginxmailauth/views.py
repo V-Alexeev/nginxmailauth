@@ -21,7 +21,7 @@ def authenticate(request):
         return HttpResponseForbidden()
 
     try:
-        mail_user = MailUser.objects.select_related().get(internal_username=username)
+        mail_user = MailUser.objects.active().select_related().get(internal_username=username)
     except (MailUser.DoesNotExist, MailUser.MultipleObjectsReturned, DatabaseError):
         return get_fail_response()
 

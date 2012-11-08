@@ -6,6 +6,13 @@ AUTHENTICATION_CHOICES = [(unicode(klass), unicode(klass)) for klass in AuthMeth
                                         if not klass.hidden]
 
 
+class MailUserManager(models.Manager):
+    use_for_related_fields = True
+
+    def active(self):
+        return self.get_query_set().filter(disabled=False)
+
+
 class MailUser(models.Model):
     internal_username = models.CharField("Internal username", max_length=50, db_index=True, unique=True)
     internal_password = models.CharField("Internal password", max_length=50, blank=True, default='',
@@ -16,6 +23,9 @@ class MailUser(models.Model):
                                      help_text="This is the user's password, used at the external service only")
     server = models.ForeignKey("MailServer", related_name="users")
     auth_method = models.CharField("Authentication method", max_length=100, choices=AUTHENTICATION_CHOICES)
+    disabled = models.BooleanField("User is disabled", default=False)
+
+    objects = MailUserManager()
 
     @property
     def auth_class(self):
@@ -25,7 +35,7 @@ class MailUser(models.Model):
         raise KeyError('Authentication class %s not found!' % self.auth_method)
 
     def authenticate(self, password):
-        return self.auth_class.authenticate(self, password)
+        return (not self.disabled) and self.auth_class.authenticate(self, password)
 
     def change_password(self, new_password):
         self.internal_password = self.auth_class.get_password(self, new_password)

@@ -78,7 +78,7 @@ else:
             username, domain = mail_user[0], mail_user[1].upper() # Kerberos uses uppercase domains
             mail_user = "@".join((username, domain))
             try:
-                result = kerberos.checkPassword(mail_user, password, "", domain)
+                result = kerberos.checkPassword(mail_user, password.encode('utf-8'), "", domain)
             except kerberos.KrbError:
                 return False
             return result
